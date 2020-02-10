@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "http://mybatis.org/dtd/mybatis-3-mapper.dtd" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.kgc.mapper.GuanUserMapper">
+	<sql id="guanUserList">
+		GUAN_ID,GUAN_NAME,GUAN_ZNAME,GUAN_PHONE,GUAN_PASSWORD,G.QUAN_ID,QUAN_NAME 
+	</sql>
+	<select id="queryByNameAndPwd" parameterType="int" resultMap="GuanResultMap">
+		SELECT 
+		<include refid="guanUserList"/>
+		 FROM GUANUSER G,QUANXIAN
+		 WHERE GUAN_NAME=#{name} AND GUAN_PASSWORD=#{password}
+	</select>
+	
+	<resultMap type="com.kgc.entity.GuanUser" id="GuanResultMap">
+		  <id property="guan_id" column="guan_id"/>
+     	  <result property="guan_name" column="guan_name"/>
+     	  <result property="guan_zname" column="guan_zname"/>
+     	  <result property="guan_phone" column="guan_phone"/>
+     	  <result property="guan_password" column="guan_password"/>
+     	   <association property="quanXian" javaType="com.kgc.entity.QuanXian">
+            <id property="quan_id" column="quan_id"/>
+            <result property="quan_name" column="quan_name"/>
+        </association>
+	</resultMap>
+	
+	<select id="queryAllGuan" resultMap="GuanResultMap">
+		SELECT
+		<include refid="guanUserList"/>
+		FROM GUANUSER G,QUANXIAN Q
+		WHERE G.QUAN_ID=Q.QUAN_ID
+	</select>
+	
+	<delete id="deleteGuan">
+		DELETE FROM GUANUSER WHERE GUAN_ID = #{guan_id}
+	</delete>
+	
+</mapper>

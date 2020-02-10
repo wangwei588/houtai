@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "http://mybatis.org/dtd/mybatis-3-mapper.dtd" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.kgc.mapper.GoodsMapper">
+  	
+  	<sql id="goods_select">
+		g_id,g_name,g_price,g_img,text,create_time,g.sort_id,sort_name,g.zt_id,
+		zt_name,g.m_id,u_name,u_phone,u_touxiang
+	</sql>
+	
+	<sql id="leftjoin_User_Sort_Zt">
+		LEFT JOIN user u on u.u_id=g.m_id 
+		LEFT JOIN sort s on g.sort_id =s.sort_id 
+		LEFT JOIN goodszhuangtai t on t.zt_id = g.zt_id
+	</sql>
+  	
+	<resultMap type="com.kgc.entity.Goods" id="GoodsResultMap">
+		<id property="g_id" column="g_id"/>
+     	<result property="g_name" column="g_name"/>
+     	<result property="g_price" column="g_price"/>
+   		<result property="g_img" column="g_img"/>
+    	<result property="text" column="text"/>
+		<result property="create_time" column="create_time"/>     	  
+     	<association property="sort" javaType="com.kgc.entity.Sort">
+			<id property="sort_id" column="sort_id"/>
+            <result property="sort_name" column="sort_name"/>
+        </association>
+        <association property="goodsZt" javaType="com.kgc.entity.GoodsZt">
+			<id property="zt_id" column="zt_id"/>
+            <result property="zt_name" column="zt_name"/>
+        </association>
+        <association property="user" javaType="com.kgc.entity.User">
+			<id property="u_id" column="u_id"/>
+            <result property="u_name" column="u_name"/>
+            <result property="u_address" column="u_address"/>
+            <result property="u_phone" column="u_phone"/>
+            <result property="u_touxiang" column="u_touxiang"/>
+        </association>
+	</resultMap>
+	
+	 	<!-- 根据分页数据start 和size查询数据 -->
+  	<select id="findByPage" resultMap="GoodsResultMap" parameterType="int">
+  		SELECT
+		<include refid="goods_select"/>
+		 FROM GOODS G 
+		<include refid="leftjoin_User_Sort_Zt"/>
+		WHERE G.ZT_ID=1
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	 	<!-- 根据分页数据start 和size查询数据 -->
+  	<select id="findByPage2" resultMap="GoodsResultMap" parameterType="int">
+  		SELECT
+		<include refid="goods_select"/>
+		 FROM GOODS G 
+		<include refid="leftjoin_User_Sort_Zt"/>
+		WHERE G.ZT_ID=3
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="selectGoodsList" resultMap="GoodsResultMap" parameterType="int">
+		SELECT
+		<include refid="goods_select" />
+		FROM GOODS G
+		<include refid="leftjoin_User_Sort_Zt"/>
+		WHERE G.ZT_ID=1
+	</select>
+	
+	<select id="selectGoodsList2" resultMap="GoodsResultMap" parameterType="int">
+		SELECT
+		<include refid="goods_select" />
+		FROM GOODS G
+		<include refid="leftjoin_User_Sort_Zt"/>
+		WHERE G.ZT_ID=3
+	</select>
+ 
+	<!-- 查询商品总数 -->
+	<select id="selectCount" resultType="int">
+		SELECT COUNT(*) FROM GOODS WHERE ZT_ID=1
+	</select>
+	
+	<!-- 查询待审核商品总数 -->
+	<select id="selectCount2" resultType="int">
+		SELECT COUNT(*) FROM GOODS WHERE ZT_ID=3
+	</select>
+	
+	<select id="queryGoods" resultMap="GoodsResultMap">
+		SELECT
+		<include refid="goods_select" />
+		FROM GOODS G
+		<include refid="leftjoin_User_Sort_Zt"/>
+		 FROM GOODS WHERE G.ZT_ID=1
+		 <where>
+              <if test="name!=null or name!=' '">
+                G_NAME LIKE #{name}
+              </if>
+        </where>
+	</select>
+	
+	<select id="queryGoods2" resultMap="GoodsResultMap">
+		SELECT
+		<include refid="goods_select" />
+		FROM GOODS G
+		<include refid="leftjoin_User_Sort_Zt"/>
+		 FROM GOODS WHERE G.ZT_ID=3
+		 <where>
+              <if test="name!=null or name!=' '">
+                G_NAME LIKE #{name}
+              </if>
+        </where>
+	</select>
+	<!-- 查询某个商品 -->
+	<select id="selectGoods" resultMap="GoodsResultMap">
+		SELECT
+		<include refid="goods_select"/>
+		 FROM GOODS G 
+		<include refid="leftjoin_User_Sort_Zt"/>
+		WHERE G.G_ID=#{id}
+	</select>
+	
+	
+	<delete id="deleteGoods">
+		DELETE FROM GOODS WHERE G_ID = #{g_id}
+	</delete>
+	
+	<update id="updateGoodsZt">
+		update goods set zt_id=#{zt_id} where g_id = #{g_id}
+	</update>
+	
+</mapper>
